@@ -1,0 +1,5 @@
+.env
+node_modules/
+samconfig.toml
+template.yaml
+.vscode/launch.json
