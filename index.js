@@ -48,6 +48,7 @@ Function returns S3 key to the pdf file
 */
 
 const BUCKET = process.env.BUCKET;
+const BASE_PATH = process.env.BASE_PATH;
 
 exports.handler = async function (event) {
 
@@ -56,15 +57,24 @@ exports.handler = async function (event) {
     body.discount =  body.discount || 0;
 
     const base64PDF = await createInvoice(body);
-
     console.log(base64PDF);
-
-    const s3Response = await saveToS3(BUCKET, "pdfs/testInvoice1.pdf", base64PDF);
+    
+    const key = generateS3Key(body.invoice_nr);
+    const s3Response = await saveToS3(BUCKET, key, base64PDF);
 
     return {
         statusCode: 200,
-        s3Key: s3Response.location
+        s3Key: s3Response.Key
     };
 
 };
-  
+
+function generateS3Key(objectIdentifier) {
+  let key = BASE_PATH;
+  if (!key.endsWith('/')) {
+    key += '/';
+  }
+  key += objectIdentifier;
+  key += '.pdf'
+  return key;
+}
