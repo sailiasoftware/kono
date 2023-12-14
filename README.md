@@ -52,3 +52,10 @@ If the url to the company logo is invalid (or there is some other issue getting 
 ### Environment variables
 - BUCKET - this is the S3 bucket that you would like to insert the generated pdf documents into
 - BASE_PATH - this is the path within the S3 bucket that you would like to place the generated pdf documents into (eg 'pdfs/receipts-and-invoices'). NOTE: There should be no '/' at the beginning or end of this variable
+
+### Future developement
+When developing this function in the furture, these are the steps that need to be taken:
+- CLone the repo
+- Run ```npm install``` to install the dependencies
+- If uploading to lambda using zip file, make sure that the node_modules directory is included in the zip file
+You should theoretically be able to run ```sam local invoke -e event.json``` if you have SAM CLI installed, but it seems to run out of memory when run locally
