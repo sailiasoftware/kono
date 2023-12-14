@@ -49,6 +49,14 @@ If the url to the company logo is invalid (or there is some other issue getting 
     }
 ```
 
+### Example response
+```
+{
+       statusCode: 200,
+       s3Key: 'BASE_PATH/invoice_nr.pdf' // Where BASE_PATH is set in .env and invoice_nr is defined in request body
+}
+```
+
 ### Environment variables
 - BUCKET - this is the S3 bucket that you would like to insert the generated pdf documents into
 - BASE_PATH - this is the path within the S3 bucket that you would like to place the generated pdf documents into (eg 'pdfs/receipts-and-invoices'). NOTE: There should be no '/' at the beginning or end of this variable
