@@ -52,7 +52,7 @@ const BASE_PATH = process.env.BASE_PATH;
 
 exports.handler = async function (event) {
 
-    const body = event.body;
+    const body = JSON.parse(event.body);
     body.isInvoice = body.isInvoice || false;
     body.discount =  body.discount || 0;
 
@@ -63,8 +63,10 @@ exports.handler = async function (event) {
     const s3Response = await saveToS3(BUCKET, key, base64PDF);
 
     return {
-        statusCode: 200,
-        s3Key: s3Response.Key
+        "isBase64Encoded": false,
+        "statusCode": 200,
+        "headers": { },
+        "body": s3Response.Key,
     };
 
 };
