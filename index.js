@@ -53,7 +53,8 @@ const BASE_PATH = process.env.BASE_PATH;
 
 exports.handler = async function (event) {
 
-    const body = JSON.parse(event.body);
+    //const body = JSON.parse(event.body);
+    const body = event.body;
     body.isInvoice = body.isInvoice || false;
     body.discount =  body.discount || 0;
     body.customerInfo = normaliseAddress(body.customerInfo);
