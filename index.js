@@ -1,6 +1,7 @@
 const createInvoice = require('./createInvoice')
 const saveToS3 = require('./saveToS3');
 require('dotenv').config();
+const normaliseAddress = require('./normaliseAddress')
 
 /*Example request body:
 const body = {
@@ -55,6 +56,8 @@ exports.handler = async function (event) {
     const body = JSON.parse(event.body);
     body.isInvoice = body.isInvoice || false;
     body.discount =  body.discount || 0;
+    body.customerInfo = normaliseAddress(body.customerInfo);
+    body.companyInfo = normaliseAddress(body.companyInfo);
 
     const base64PDF = await createInvoice(body);
     console.log(base64PDF);
@@ -68,7 +71,6 @@ exports.handler = async function (event) {
         "headers": { },
         "body": s3Response.Key,
     };
-
 };
 
 function generateS3Key(objectIdentifier) {
