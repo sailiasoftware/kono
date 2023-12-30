@@ -3,6 +3,7 @@ const axios = require('axios')
 
 let RECORD_TYPE_TEXT = 'Invoice';
 let DUE_OR_PAID_TEXT = 'Due';
+let ACCENT_COLOUR = '#19a6eb';
 
 async function createInvoice(docParams) {
   RECORD_TYPE_TEXT = docParams.isInvoice ? 'Invoice' : 'Receipt';
@@ -10,19 +11,21 @@ async function createInvoice(docParams) {
 
   let doc = new PDFDocument({ size: "A4", margin: 50 });
 
-  generateTopAccent(doc, "#40c2c2", 7);
+  generateTopAccent(doc, 7);
   await generateHeader(doc, docParams);
   generateCustomerInformation(doc, docParams);
-  generateInvoiceTable(doc, docParams);
-  //generateFooter(doc);
+  const invoiceTableEndPosition = generateInvoiceTable(doc, docParams);
+  if (docParams.paynowLink) {
+    generatePayNowButton(doc, invoiceTableEndPosition+30, docParams);
+  }
 
   return await getBase64(doc);
     
 }
 
-function generateTopAccent(doc, hexColour, width) {
+function generateTopAccent(doc, width) {
     doc
-      .strokeColor("#19a6eb")
+      .strokeColor(ACCENT_COLOUR)
       .lineWidth(width)
       .moveTo(0, 1)
       .lineTo(doc.page.width, 1)
@@ -85,6 +88,8 @@ function generateCustomerInformation(doc, invoice) {
 }
 
 function generateInvoiceTable(doc, invoice) {
+    // Generates the invoice table and the returns the y position of the end of the table
+
     let i;
     const invoiceTableTop = 330;
   
@@ -152,6 +157,22 @@ function generateInvoiceTable(doc, invoice) {
       formatCurrency(invoice.subtotal - invoice.discount)
     );
     doc.font("Helvetica");
+    return duePosition;
+}
+
+function generatePayNowButton(doc, y, docParams) {
+    const buttonWidth = 75;
+    const buttonHeight = 25;
+    const buttonX = (doc.page.width - buttonWidth - 50) ; // Calculate the x position of the button
+    const buttonY = y;
+    const cornerRadius = 10; // Add this line to define the corner radius
+    doc.roundedRect(buttonX, buttonY, buttonWidth, buttonHeight, cornerRadius).fillAndStroke(ACCENT_COLOUR, ACCENT_COLOUR);
+    const linkUrl = docParams.paynowLink;
+    doc.link(buttonX, buttonY, buttonWidth, buttonHeight, linkUrl);
+    doc.fontSize(12).fillColor("#FFFFFF").text("Pay Now", buttonX, buttonY + 8, {
+        width: buttonWidth,
+        align: "center",
+    });
 }
 
 

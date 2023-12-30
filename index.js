@@ -42,7 +42,8 @@ const body = {
     ],
     subtotal: 8000,
     //discount: 950,
-    invoice_nr: 1234
+    invoice_nr: 1234,
+    paynowLink: "https://sailia.co.uk/",
 };
 
 Function returns S3 key to the pdf file
