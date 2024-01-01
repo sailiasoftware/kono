@@ -168,7 +168,9 @@ function generatePayNowButton(doc, y, docParams) {
     const cornerRadius = 10; // Add this line to define the corner radius
     doc.roundedRect(buttonX, buttonY, buttonWidth, buttonHeight, cornerRadius).fillAndStroke(ACCENT_COLOUR, ACCENT_COLOUR);
     const linkUrl = docParams.paynowLink;
+    if (linkUrl !== '#') {
     doc.link(buttonX, buttonY, buttonWidth, buttonHeight, linkUrl);
+    }
     doc.fontSize(12).fillColor("#FFFFFF").text("Pay Now", buttonX, buttonY + 8, {
         width: buttonWidth,
         align: "center",
