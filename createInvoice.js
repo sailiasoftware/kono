@@ -11,13 +11,22 @@ async function createInvoice(docParams) {
 
   let doc = new PDFDocument({ size: "A4", margin: 50 });
 
+  let expiryDateObject = null;
+  if (docParams.expiry) {
+    let dateParts = docParams.expiry.split("-");
+    dateParts[0] = parseInt(dateParts[0]); // YYYY
+    dateParts[0] = dateParts[0] < 2000 ? dateParts[0] + 2000 : dateParts[0];
+    dateParts[1] = parseInt(dateParts[1])-1; // MM (indexing starts at 0)
+    dateParts[2] = parseInt(dateParts[2]); // DD
+    expiryDateObject = new Date(dateParts[0], dateParts[1], dateParts[2]);
+  }
+
   generateTopAccent(doc, 7);
   await generateHeader(doc, docParams);
-  generateCustomerInformation(doc, docParams);
+  generateCustomerInformation(doc, docParams, expiryDateObject);
   const invoiceTableEndPosition = generateInvoiceTable(doc, docParams);
-  if (docParams.paynowLink) {
-    generatePayNowButton(doc, invoiceTableEndPosition+30, docParams);
-  }
+  if (docParams.paynowLink) { generatePayNowButton(doc, invoiceTableEndPosition+30, docParams); }
+  if (docParams.expiry) { generateExpiryFooter(doc, docParams, expiryDateObject); }
 
   return await getBase64(doc);
     
@@ -53,7 +62,7 @@ async function generateHeader(doc, docParams) {
       .moveDown();
 }
 
-function generateCustomerInformation(doc, invoice) {
+function generateCustomerInformation(doc, invoice, expiryDateObject) {
   doc
         .fillColor("#444444")
         .fontSize(20)
@@ -74,7 +83,13 @@ function generateCustomerInformation(doc, invoice) {
         .text(
             formatCurrency(invoice.subtotal - invoice.discount), 150, customerInformationTop + 30
         )
-    
+    if (expiryDateObject) {
+        doc
+            .text("Pay by: ", 50, customerInformationTop + 45)
+            .text(formatDate(expiryDateObject), 150, customerInformationTop + 45)
+    }
+
+    doc
         .font("Helvetica-Bold")
         .text(invoice.customerInfo.name, 300, customerInformationTop)
         .font("Helvetica")
@@ -169,14 +184,31 @@ function generatePayNowButton(doc, y, docParams) {
     doc.roundedRect(buttonX, buttonY, buttonWidth, buttonHeight, cornerRadius).fillAndStroke(ACCENT_COLOUR, ACCENT_COLOUR);
     const linkUrl = docParams.paynowLink;
     if (linkUrl !== '#') {
-    doc.link(buttonX, buttonY, buttonWidth, buttonHeight, linkUrl);
+      doc.link(buttonX, buttonY, buttonWidth, buttonHeight, linkUrl);
     }
     doc.fontSize(12).fillColor("#FFFFFF").text("Pay Now", buttonX, buttonY + 8, {
         width: buttonWidth,
         align: "center",
     });
+    doc.fillColor("#444444");
 }
 
+function generateExpiryFooter(doc, docParams, expiryDateObject) {
+  const dateString = expiryDateObject.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  doc
+    .fontSize(10)
+    .text(
+      "This document will become void if not paid by: "+dateString,
+      50,
+      780,
+      { align: "center", width: 500 }
+    );
+}
 
 
 async function getLogo(url) {
