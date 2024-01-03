@@ -1,6 +1,9 @@
 const AWS = require('aws-sdk')
 
 const normaliseAddress = function(info) {
+  if (!info) {
+    info = {};
+  }
   // If there are undefined or empty lines, move future lines up
   const lines = [];
   if (info.addressLine1) { lines.push(info.addressLine1) };
