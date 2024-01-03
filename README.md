@@ -56,8 +56,10 @@ If the url to the company logo is invalid (or there is some other issue getting 
 ### Example response
 ```
 {
-       statusCode: 200,
-       s3Key: 'BASE_PATH/invoice_nr.pdf' // Where BASE_PATH is set in .env and invoice_nr is defined in request body
+  "isBase64Encoded": false,
+  "statusCode": 200,
+  "headers": {},
+  "body": "pdfs/1234.pdf"
 }
 ```
 
