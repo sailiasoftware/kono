@@ -19,13 +19,14 @@ async function createInvoice(docParams) {
     dateParts[2] = parseInt(dateParts[2]); // DD
     expiryDateObject = new Date(dateParts[0], dateParts[1], dateParts[2]);
   }
+  const showPayNowButton = docParams.paynowLink && !(docParams.status == 'VOID' || docParams.status == 'PAID');
 
   generateTopAccent(doc, 7, docParams.accentColour);
   await generateHeader(doc, docParams);
   generateCustomerInformation(doc, docParams, expiryDateObject);
   const invoiceTableEndPosition = generateInvoiceTable(doc, docParams);
-  if (docParams.paynowLink) { generatePayNowButton(doc, invoiceTableEndPosition+30, docParams); }
-  if (docParams.expiry) { generateExpiryFooter(doc, docParams, expiryDateObject); }
+  if (showPayNowButton) { generatePayNowButton(doc, invoiceTableEndPosition+30, docParams); }
+  generateFooter(doc, docParams, expiryDateObject);
 
   return await getBase64(doc);
     
@@ -82,7 +83,15 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
         .text(
             formatCurrency(invoice.subtotal - invoice.discount), 150, customerInformationTop + 30
         )
-    if (expiryDateObject) {
+    if (invoice.status == 'VOID') {
+        doc
+            .text("Status: ", 50, customerInformationTop + 45)
+            .text("VOID", 150, customerInformationTop + 45)
+    } else if (invoice.status == 'PAID') {
+      doc
+          .text("Status: ", 50, customerInformationTop + 45)
+          .text("PAID", 150, customerInformationTop + 45)
+    } else if (expiryDateObject) {
         doc
             .text("Pay by: ", 50, customerInformationTop + 45)
             .text(formatDate(expiryDateObject), 150, customerInformationTop + 45)
@@ -192,21 +201,29 @@ function generatePayNowButton(doc, y, docParams) {
     doc.fillColor("#444444");
 }
 
-function generateExpiryFooter(doc, docParams, expiryDateObject) {
-  const dateString = expiryDateObject.toLocaleDateString('en-GB', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  doc
-    .fontSize(10)
-    .text(
-      "This document will become void if not paid by: "+dateString,
-      50,
-      780,
-      { align: "center", width: 500 }
-    );
+function generateFooter(doc, docParams, expiryDateObject) {
+    let footerText = '';
+    if (docParams.status == 'VOID') {
+      footerText = 'This document has been marked as VOID.';
+    } else if (expiryDateObject) {
+      footerText = 'This document has been marked as PAID.';
+    } else if (expiryDateObject) {
+        const dateString = expiryDateObject.toLocaleDateString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+        footerText = "This document will become void if not paid by: "+dateString;
+    }
+    doc
+        .fontSize(10)
+        .text(
+        footerText,
+        50,
+        780,
+        { align: "center", width: 500 }
+        );
 }
 
 
