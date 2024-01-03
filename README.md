@@ -3,7 +3,7 @@
 This is a Lambda function that is used to generate PDF documents for receipts and invoices. The function is to be triggered by an API gateway POST request.
 If the url to the company logo is invalid (or there is some other issue getting the logo) then the company name will be used instead.
 
-![Example PDF document](https://i.ibb.co/9Zd8tsH/Screenshot-2023-12-13-131810.png)
+[![Example of PDF document](https://iili.io/J51XUox.md.png)](https://freeimage.host/i/J51XUox)
 
 ### Example request body
 ```
@@ -12,23 +12,24 @@ If the url to the company logo is invalid (or there is some other issue getting 
        "companyInfo":{
           "logoUrl":"sailiaLogo",
           "companyName":"Sailia Limited",
-          "addressLine1":"123  Office Building House",
+          "addressLine1":"123  Office Building House",  // addressLine1 to addressLine 4 are optional
           "addressLine2":"Avenue Road",
           "addressLine3":"York",
           "addressLine4":"North Yorkshire, DS8 6WQ"
        },
        "customerInfo":{
           "name":"Tim Smith",
-          "addressLine1":"1234 Address Street",
+          "addressLine1":"1234 Address Street",  // addressLine1 to addressLine 4 are optional
           "addressLine2":"Leeds",
           "addressLine3":"North Yorkshire, R23 5QUW"
+          "addressLine4": ""
        },
        "products":[
           {
              "name":"RYA Start Sailing",
              "description":"Sailing",
              "quantity":2,
-             "cost":6000
+             "cost":6000  // This is the total cost for the product (i.e. NOT UNIT PRICE)
           },
           {
              "name":"Starter session",
@@ -45,15 +46,20 @@ If the url to the company logo is invalid (or there is some other issue getting 
        ],
        "subtotal":8000,
        "discount":950,
-       "invoice_nr":1234
+       "invoice_nr":1234,
+       "paynowLink": "www.example.com",   // (optional). Link to payment. If present, a blue 'Pay Now' button will appear on the invoice
+                                          // If set to '#', the button will appear but will not be active. This is for display purposes,
+       "expiry": "2024-03-22"  // YYYY-MM-DD
     }
 ```
 
 ### Example response
 ```
 {
-       statusCode: 200,
-       s3Key: 'BASE_PATH/invoice_nr.pdf' // Where BASE_PATH is set in .env and invoice_nr is defined in request body
+  "isBase64Encoded": false,
+  "statusCode": 200,
+  "headers": {},
+  "body": "pdfs/1234.pdf"
 }
 ```
 
