@@ -3,7 +3,7 @@
 This is a Lambda function that is used to generate PDF documents for receipts and invoices. The function is to be triggered by an API gateway POST request.
 If the url to the company logo is invalid (or there is some other issue getting the logo) then the company name will be used instead.
 
-[![Example of pdf document](https://iili.io/J51MIj4.md.png)](https://freeimage.host/i/J51MIj4)
+[![Example of PDF document](https://iili.io/J51XUox.md.png)](https://freeimage.host/i/J51XUox)
 
 ### Example request body
 ```
