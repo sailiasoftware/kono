@@ -3,7 +3,6 @@ const axios = require('axios')
 
 let RECORD_TYPE_TEXT = 'Invoice';
 let DUE_OR_PAID_TEXT = 'Due';
-let ACCENT_COLOUR = '#19a6eb';
 
 async function createInvoice(docParams) {
   RECORD_TYPE_TEXT = docParams.isInvoice ? 'Invoice' : 'Receipt';
@@ -21,7 +20,7 @@ async function createInvoice(docParams) {
     expiryDateObject = new Date(dateParts[0], dateParts[1], dateParts[2]);
   }
 
-  generateTopAccent(doc, 7);
+  generateTopAccent(doc, 7, docParams.accentColour);
   await generateHeader(doc, docParams);
   generateCustomerInformation(doc, docParams, expiryDateObject);
   const invoiceTableEndPosition = generateInvoiceTable(doc, docParams);
@@ -32,9 +31,9 @@ async function createInvoice(docParams) {
     
 }
 
-function generateTopAccent(doc, width) {
+function generateTopAccent(doc, width, accentColour) {
     doc
-      .strokeColor(ACCENT_COLOUR)
+      .strokeColor(accentColour)
       .lineWidth(width)
       .moveTo(0, 1)
       .lineTo(doc.page.width, 1)
@@ -181,7 +180,7 @@ function generatePayNowButton(doc, y, docParams) {
     const buttonX = (doc.page.width - buttonWidth - 50) ; // Calculate the x position of the button
     const buttonY = y;
     const cornerRadius = 10; // Add this line to define the corner radius
-    doc.roundedRect(buttonX, buttonY, buttonWidth, buttonHeight, cornerRadius).fillAndStroke(ACCENT_COLOUR, ACCENT_COLOUR);
+    doc.roundedRect(buttonX, buttonY, buttonWidth, buttonHeight, cornerRadius).fillAndStroke(docParams.accentColour, docParams.accentColour);
     const linkUrl = docParams.paynowLink;
     if (linkUrl !== '#') {
       doc.link(buttonX, buttonY, buttonWidth, buttonHeight, linkUrl);
@@ -237,7 +236,7 @@ function generateTableRow(
     doc
       .fontSize(10)
       .text(name, 50, y)
-      .text(description, 150, y)
+      .text(description, 230, y)
       .text(unitCost, 280, y, { width: 90, align: "right" })
       .text(quantity, 370, y, { width: 90, align: "right" })
       .text(lineTotal, 0, y, { align: "right" });

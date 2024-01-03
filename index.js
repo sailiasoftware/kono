@@ -58,6 +58,7 @@ exports.handler = async function (event) {
     const body = event.body;
     body.isInvoice = body.isInvoice || false;
     body.discount =  body.discount || 0;
+    body.accentColour =  body.accentColour || '#19a6eb';
     body.customerInfo = normaliseAddress(body.customerInfo);
     body.companyInfo = normaliseAddress(body.companyInfo);
 
