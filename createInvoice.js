@@ -83,18 +83,28 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
         .text(
             formatCurrency(invoice.subtotal - invoice.discount), 150, customerInformationTop + 30
         )
+    let nextLineY = customerInformationTop + 45;
     if (invoice.status == 'VOID') {
         doc
-            .text("Status: ", 50, customerInformationTop + 45)
-            .text("VOID", 150, customerInformationTop + 45)
+            .text("Status: ", 50, nextLineY)
+            .text("VOID", 150, nextLineY)
+        nextLineY += 15;
     } else if (invoice.status == 'PAID') {
       doc
-          .text("Status: ", 50, customerInformationTop + 45)
-          .text("PAID", 150, customerInformationTop + 45)
+          .text("Status: ", 50, nextLineY)
+          .text("PAID", 150, nextLineY)
+          nextLineY += 15;
     } else if (expiryDateObject) {
         doc
-            .text("Pay by: ", 50, customerInformationTop + 45)
-            .text(formatDate(expiryDateObject), 150, customerInformationTop + 45)
+            .text("Pay by: ", 50, nextLineY)
+            .text(formatDate(expiryDateObject), 150, nextLineY)
+            nextLineY += 15;
+    }
+    if (invoice.reference) {
+        doc
+            .text("Reference: ", 50, nextLineY)
+            .text(invoice.reference, 150, nextLineY)
+            nextLineY += 15;
     }
 
     doc
@@ -107,7 +117,7 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
         .text(invoice.customerInfo.addressLine4, 300, customerInformationTop + 60)
         .moveDown();
     
-        generateHrLine(doc, customerInformationTop + 75);
+        generateHrLine(doc, customerInformationTop + 90);
 }
 
 function generateInvoiceTable(doc, invoice) {

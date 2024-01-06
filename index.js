@@ -59,6 +59,7 @@ exports.handler = async function (event) {
     body.isInvoice = body.isInvoice || false;
     body.discount =  body.discount || 0;
     body.status = !body.isInvoice ? 'PAID' : body.status;
+    body.reference = body.reference || '';
     body.accentColour =  body.accentColour || '#19a6eb';
     body.customerInfo = normaliseAddress(body.customerInfo);
     body.companyInfo = normaliseAddress(body.companyInfo);
