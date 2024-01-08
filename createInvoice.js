@@ -215,7 +215,7 @@ function generateFooter(doc, docParams, expiryDateObject) {
     let footerText = '';
     if (docParams.status == 'VOID') {
       footerText = 'This document has been marked as VOID.';
-    } else if (expiryDateObject) {
+    } else if (docParams.status == 'PAID') {
       footerText = 'This document has been marked as PAID.';
     } else if (expiryDateObject) {
         const dateString = expiryDateObject.toLocaleDateString('en-GB', {
