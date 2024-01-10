@@ -146,8 +146,8 @@ function generateInvoiceTable(doc, invoice) {
       generateTableRow(
         doc,
         position,
-        product.name,
-        product.description,
+        limitTextLength(doc, product.name, 170),
+        limitTextLength(doc, product.description, 100),
         formatCurrency(product.cost / product.quantity),
         product.quantity,
         formatCurrency(product.cost)
@@ -264,9 +264,24 @@ function generateTableRow(
       .fontSize(10)
       .text(name, 50, y)
       .text(description, 230, y)
-      .text(unitCost, 280, y, { width: 90, align: "right" })
+      .text(unitCost, 290, y, { width: 90, align: "right" })
       .text(quantity, 370, y, { width: 90, align: "right" })
       .text(lineTotal, 0, y, { align: "right" });
+}
+
+function limitTextLength(doc, text, width) {
+  let textWidth = doc.widthOfString(text);
+  let widthOfDots = doc.widthOfString('...');
+  if (textWidth <= width) {
+    return text;
+  }
+  while (textWidth+widthOfDots > width) {
+    text = text.slice(0, -1);
+    textWidth = doc.widthOfString(text);
+    console.log(text+' '+(textWidth+widthOfDots));
+  }
+  text += '...';
+  return text;
 }
 
 function formatCurrency(pence) {
