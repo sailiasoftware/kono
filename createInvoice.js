@@ -45,7 +45,7 @@ async function generateHeader(doc, docParams) {
 
   try {
     const logoData = await getLogo(docParams.companyInfo.logoUrl);
-    doc.image(logoData, 50, 50, { width: 150 })
+    doc.image(logoData, 50, 50, { fit:[100, 75], valign: 'center'});
   } catch (error) {
     doc.fontSize(24)
       .text(docParams.companyInfo.companyName, 50, 65)
