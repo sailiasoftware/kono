@@ -5,45 +5,52 @@ const normaliseAddress = require('./normaliseAddress')
 
 /*Example request body:
 const body = {
-    isInvoice: true,
-    companyInfo: {
-      logoUrl: sailiaLogo,
-      companyName: "Sailia Limited",
-      addressLine1: "123  Office Building House",
-      addressLine2: "Avenue Road",
-      addressLine3: "York",
-      addressLine4: "North Yorkshire, DS8 6WQ",
+    "isInvoice":true,
+    "companyInfo":{
+        "logoUrl":"sailiaLogo",
+        "companyName":"Sailia Limited",
+        "addressLine1":"123  Office Building House",  // addressLine1 to addressLine 4 are optional
+        "addressLine2":"Avenue Road",
+        "addressLine3":"York",
+        "addressLine4":"North Yorkshire, DS8 6WQ"
     },
-    customerInfo: {
-      name: "Tim Smith",
-      addressLine1: "1234 Address Street",
-      addressLine2: "Leeds",
-      addressLine3: "North Yorkshire, R23 5QUW",
+    "customerInfo":{
+        "name":"Tim Smith",
+        "addressLine1":"1234 Address Street",  // addressLine1 to addressLine 4 are optional
+        "addressLine2":"Leeds",
+        "addressLine3":"North Yorkshire, R23 5QUW"
+        "addressLine4": ""
     },
-    products: [
-      {
-        name: "RYA Start Sailing",
-        description: "Sailing",
-        quantity: 2,
-        cost: 6000
-      },
-      {
-        name: "Starter session",
-        description: "Wind Surfing",
-        quantity: 1,
-        cost: 2000
-      },
-      {
-        name: "Starter session",
-        description: "Wind Surfing",
-        quantity: 1,
-        cost: 2000
-      }
+    "products":[
+        {
+            "name":"RYA Start Sailing",
+            "description":"Sailing",
+            "quantity":2,
+            "cost":6000  // This is the total cost for the product (i.e. NOT UNIT PRICE)
+        },
+        {
+            "name":"Starter session",
+            "description":"Wind Surfing",
+            "quantity":1,
+            "cost":2000
+        },
+        {
+            "name":"Starter session",
+            "description":"Wind Surfing",
+            "quantity":1,
+            "cost":2000
+        }
     ],
-    subtotal: 8000,
-    //discount: 950,
-    invoice_nr: 1234,
-    paynowLink: "https://sailia.co.uk/",
+    "subtotal":10000,
+    "discount":950,
+    "tenantNet": 8000,      // (optional). This is what the tenant will receive after the discount, stripe and sailia fees
+                            // If not present, this will be calculated as subtotal-discount
+    "invoice_nr":00001,
+    "paynowLink": "www.example.com",   // (optional). Link to payment. If present, a blue 'Pay Now' button will appear on the invoice
+                                      // If set to '#', the button will appear but will not be active. This is for display purposes,
+    "expiry": "2024-03-22",  // YYYY-MM-DD
+    "taxRate": 0.2,
+    "taxNumber": "GB123456"
 };
 
 Function returns S3 key to the pdf file
@@ -63,6 +70,7 @@ exports.handler = async function (event) {
     body.accentColour =  body.accentColour || '#19a6eb';
     body.customerInfo = normaliseAddress(body.customerInfo);
     body.companyInfo = normaliseAddress(body.companyInfo);
+    body.tenantNet = body.tenantNet || (body.subtotal - body.discount);
 
     const base64PDF = await createInvoice(body);
     console.log(base64PDF);
@@ -79,11 +87,11 @@ exports.handler = async function (event) {
 };
 
 function generateS3Key(objectIdentifier) {
-  let key = BASE_PATH;
-  if (!key.endsWith('/')) {
-    key += '/';
-  }
-  key += objectIdentifier;
-  key += '.pdf'
-  return key;
+    let key = BASE_PATH;
+    if (!key.endsWith('/')) {
+        key += '/';
+    }
+    key += objectIdentifier;
+    key += '.pdf'
+    return key;
 }

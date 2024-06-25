@@ -181,8 +181,8 @@ function generateInvoiceTable(doc, invoice) {
         generateHrLine(doc, position + 20);
     }
 
-    let totalInclVAT = invoice.subtotal - invoice.discount;
-    let totalExclVAT = totalInclVAT/(1+invoice.taxRate)
+    let totalPayable = invoice.subtotal - invoice.discount;
+    let vatAmount = invoice.tenantNet - (invoice.tenantNet/(1+invoice.taxRate)); // tenantNet is the total amount the tenant will receive after fees
 
     position = invoiceTableTop + (i + 1) * 30;
     generateTableRow(
@@ -215,7 +215,7 @@ function generateInvoiceTable(doc, invoice) {
             "",
             "",
             `VAT (${invoice.taxRate*100}%)`,
-            formatCurrency(totalInclVAT - totalExclVAT)
+            formatCurrency(vatAmount)
         );
     }
 
@@ -228,7 +228,7 @@ function generateInvoiceTable(doc, invoice) {
         "",
         "",
         "Total" + (invoice.taxRate ? " Incl. VAT" : ""),
-        formatCurrency(totalInclVAT)
+        formatCurrency(totalPayable)
     );
     doc.font("Helvetica");
 
