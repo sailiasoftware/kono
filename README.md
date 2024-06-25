@@ -49,7 +49,9 @@ If the url to the company logo is invalid (or there is some other issue getting 
        "invoice_nr":1234,
        "paynowLink": "www.example.com",   // (optional). Link to payment. If present, a blue 'Pay Now' button will appear on the invoice
                                           // If set to '#', the button will appear but will not be active. This is for display purposes,
-       "expiry": "2024-03-22"  // YYYY-MM-DD
+       "expiry": "2024-03-22",  // YYYY-MM-DD
+       "taxRate": 0.2,
+       "taxNumber": "GB123456"
     }
 ```
 
