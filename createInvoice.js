@@ -126,14 +126,8 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
     }
     if (invoice.taxNumber) {
         doc
-            .text("Tax Number: ", 50, nextLineY)
+            .text("VAT Number: ", 50, nextLineY)
             .text(invoice.taxNumber, 150, nextLineY)
-        nextLineY += 15;
-    }
-    if (invoice.taxRate) {
-        doc
-            .text("Tax Rate: ", 50, nextLineY)
-            .text(`${invoice.taxRate*100}%`, 150, nextLineY)
         nextLineY += 15;
     }
 
@@ -147,7 +141,8 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
         .text(invoice.customerInfo.addressLine4, 300, customerInformationTop + 60)
         .moveDown();
 
-    generateHrLine(doc, customerInformationTop + 90);
+    let sectionEndY = Math.max(customerInformationTop + 75, nextLineY);
+    generateHrLine(doc, sectionEndY);
 }
 
 function generateInvoiceTable(doc, invoice) {
@@ -186,6 +181,9 @@ function generateInvoiceTable(doc, invoice) {
         generateHrLine(doc, position + 20);
     }
 
+    let totalInclVAT = invoice.subtotal - invoice.discount;
+    let totalExclVAT = totalInclVAT/(1+invoice.taxRate)
+
     position = invoiceTableTop + (i + 1) * 30;
     generateTableRow(
         doc,
@@ -216,8 +214,8 @@ function generateInvoiceTable(doc, invoice) {
             "",
             "",
             "",
-            "Balance Excl. VAT",
-            formatCurrency((invoice.subtotal-invoice.discount) / (1 + invoice.taxRate))
+            `VAT (${invoice.taxRate*100}%)`,
+            formatCurrency(totalInclVAT - totalExclVAT)
         );
     }
 
@@ -229,8 +227,8 @@ function generateInvoiceTable(doc, invoice) {
         "",
         "",
         "",
-        "Balance " + DUE_OR_PAID_TEXT + " " + (invoice.taxRate ? "Incl. VAT" : ""),
-        formatCurrency(invoice.subtotal - invoice.discount)
+        "Total" + (invoice.taxRate ? " Incl. VAT" : ""),
+        formatCurrency(totalInclVAT)
     );
     doc.font("Helvetica");
 
