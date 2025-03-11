@@ -6,6 +6,7 @@ const normaliseAddress = require('./normaliseAddress')
 /*Example request body:
 const body = {
     "isInvoice":true,
+    "currencySymbol":"€",
     "companyInfo":{
         "logoUrl":"sailiaLogo",
         "companyName":"Sailia Limited",

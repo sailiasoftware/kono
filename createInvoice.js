@@ -7,6 +7,7 @@ let DUE_OR_PAID_TEXT = 'Due';
 async function createInvoice(docParams) {
     RECORD_TYPE_TEXT = docParams.isInvoice ? 'Invoice' : 'Receipt';
     DUE_OR_PAID_TEXT = docParams.isInvoice ? 'Due' : 'Paid';
+    const currencySymbol = docParams.currencySymbol || "£";
 
     let doc = new PDFDocument({
         size: "A4",
@@ -26,8 +27,8 @@ async function createInvoice(docParams) {
 
     generateTopAccent(doc, 7, docParams.accentColour);
     await generateHeader(doc, docParams);
-    generateCustomerInformation(doc, docParams, expiryDateObject);
-    const invoiceTableEndPosition = generateInvoiceTable(doc, docParams);
+    generateCustomerInformation(doc, docParams, expiryDateObject, currencySymbol);
+    const invoiceTableEndPosition = generateInvoiceTable(doc, docParams, currencySymbol);
     if (showPayNowButton) {
         generatePayNowButton(doc, invoiceTableEndPosition + 30, docParams);
     }
@@ -80,7 +81,7 @@ async function generateHeader(doc, docParams) {
         .moveDown();
 }
 
-function generateCustomerInformation(doc, invoice, expiryDateObject) {
+function generateCustomerInformation(doc, invoice, expiryDateObject, currencySymbol) {
     doc
         .fillColor("#444444")
         .fontSize(20)
@@ -99,7 +100,7 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
         .text(formatDate(new Date()), 150, customerInformationTop + 15)
         .text("Balance " + DUE_OR_PAID_TEXT + ":", 50, customerInformationTop + 30)
         .text(
-            formatCurrency(invoice.subtotal - invoice.discount), 150, customerInformationTop + 30
+            formatCurrency(invoice.subtotal - invoice.discount, currencySymbol), 150, customerInformationTop + 30
         )
     let nextLineY = customerInformationTop + 45;
     if (invoice.status == 'VOID') {
@@ -145,7 +146,7 @@ function generateCustomerInformation(doc, invoice, expiryDateObject) {
     generateHrLine(doc, sectionEndY);
 }
 
-function generateInvoiceTable(doc, invoice) {
+function generateInvoiceTable(doc, invoice, currencySymbol) {
     // Generates the invoice table and the returns the y position of the end of the table
 
     let i;
@@ -173,9 +174,9 @@ function generateInvoiceTable(doc, invoice) {
             position,
             limitTextLength(doc, product.name, 170),
             limitTextLength(doc, product.description, 100),
-            formatCurrency(product.cost / product.quantity),
+            formatCurrency(product.cost / product.quantity, currencySymbol),
             product.quantity,
-            formatCurrency(product.cost)
+            formatCurrency(product.cost, currencySymbol)
         );
 
         generateHrLine(doc, position + 20);
@@ -192,7 +193,7 @@ function generateInvoiceTable(doc, invoice) {
         "",
         "",
         "Subtotal",
-        formatCurrency(invoice.subtotal)
+        formatCurrency(invoice.subtotal, currencySymbol)
     );
 
     position += 15;
@@ -203,7 +204,7 @@ function generateInvoiceTable(doc, invoice) {
         "",
         "",
         "Discount",
-        formatCurrency(invoice.discount)
+        formatCurrency(invoice.discount, currencySymbol)
     );
 
     if (invoice.taxRate) {
@@ -215,7 +216,7 @@ function generateInvoiceTable(doc, invoice) {
             "",
             "",
             `VAT (${invoice.taxRate*100}%)`,
-            formatCurrency(vatAmount)
+            formatCurrency(vatAmount, currencySymbol)
         );
     }
 
@@ -228,7 +229,7 @@ function generateInvoiceTable(doc, invoice) {
         "",
         "",
         "Total" + (invoice.taxRate ? " Incl. VAT" : ""),
-        formatCurrency(totalPayable)
+        formatCurrency(totalPayable, currencySymbol)
     );
     doc.font("Helvetica");
 
@@ -338,8 +339,8 @@ function limitTextLength(doc, text, width) {
     return text;
 }
 
-function formatCurrency(pence) {
-    return "£" + (pence / 100).toFixed(2);
+function formatCurrency(pence, currencySymbol = "£") {
+    return currencySymbol + (pence / 100).toFixed(2);
 }
 
 function formatDate(date) {
