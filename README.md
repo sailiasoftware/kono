@@ -46,8 +46,6 @@ If the url to the company logo is invalid (or there is some other issue getting 
     ],
     "subtotal":10000,
     "discount":950,
-    "tenantNet": 8000,      // (optional). This is what the tenant will receive after the discount, stripe and sailia fees
-                            // If not present, this will be calculated as subtotal-discount
     "invoice_nr":00001,
     "paynowLink": "www.example.com",   // (optional). Link to payment. If present, a blue 'Pay Now' button will appear on the invoice
                                       // If set to '#', the button will appear but will not be active. This is for display purposes,

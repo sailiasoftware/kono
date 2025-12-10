@@ -183,7 +183,7 @@ function generateInvoiceTable(doc, invoice, currencySymbol) {
     }
 
     let totalPayable = invoice.subtotal - invoice.discount;
-    let vatAmount = invoice.tenantNet - (invoice.tenantNet/(1+invoice.taxRate)); // tenantNet is the total amount the tenant will receive after fees
+    let vatAmount = totalPayable - (totalPayable/(1+invoice.taxRate)); // VAT amount calculated from the total payable (VAT inclusive)
 
     position = invoiceTableTop + (i + 1) * 30;
     generateTableRow(

@@ -44,8 +44,6 @@ const body = {
     ],
     "subtotal":10000,
     "discount":950,
-    "tenantNet": 8000,      // (optional). This is what the tenant will receive after the discount, stripe and sailia fees
-                            // If not present, this will be calculated as subtotal-discount
     "invoice_nr":00001,
     "paynowLink": "www.example.com",   // (optional). Link to payment. If present, a blue 'Pay Now' button will appear on the invoice
                                       // If set to '#', the button will appear but will not be active. This is for display purposes,
@@ -71,7 +69,6 @@ exports.handler = async function (event) {
     body.accentColour =  body.accentColour || '#19a6eb';
     body.customerInfo = normaliseAddress(body.customerInfo);
     body.companyInfo = normaliseAddress(body.companyInfo);
-    body.tenantNet = body.tenantNet || (body.subtotal - body.discount);
 
     const base64PDF = await createInvoice(body);
     console.log(base64PDF);
