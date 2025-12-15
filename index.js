@@ -45,6 +45,7 @@ const body = {
     "subtotal":10000,
     "discount":950,
     "invoice_nr":00001,
+    "date": "2025-05-02",  // (optional) YYYY-MM-DD format. Invoice/receipt date. If not provided or invalid, uses current date
     "paynowLink": "www.example.com",   // (optional). Link to payment. If present, a blue 'Pay Now' button will appear on the invoice
                                       // If set to '#', the button will appear but will not be active. This is for display purposes,
     "expiry": "2024-03-22",  // YYYY-MM-DD

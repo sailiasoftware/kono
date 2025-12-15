@@ -4,6 +4,27 @@ const axios = require('axios')
 let RECORD_TYPE_TEXT = 'Invoice';
 let DUE_OR_PAID_TEXT = 'Due';
 
+function parseDateString(dateString) {
+    // Validate date format YYYY-MM-DD
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(dateString)) {
+        return null;
+    }
+
+    const dateParts = dateString.split("-");
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1; // MM (indexing starts at 0)
+    const day = parseInt(dateParts[2]);
+
+    // Create date and validate it's valid (e.g., not 2025-13-45)
+    const dateObj = new Date(year, month, day);
+    if (dateObj.getFullYear() !== year || dateObj.getMonth() !== month || dateObj.getDate() !== day) {
+        return null;
+    }
+
+    return dateObj;
+}
+
 async function createInvoice(docParams) {
     RECORD_TYPE_TEXT = docParams.isInvoice ? 'Invoice' : 'Receipt';
     DUE_OR_PAID_TEXT = docParams.isInvoice ? 'Due' : 'Paid';
@@ -13,6 +34,15 @@ async function createInvoice(docParams) {
         size: "A4",
         margin: 50
     });
+
+    // Parse invoice/receipt date from parameter, or use current date
+    let invoiceDateObject = new Date();
+    if (docParams.date) {
+        const parsedDate = parseDateString(docParams.date);
+        if (parsedDate) {
+            invoiceDateObject = parsedDate;
+        }
+    }
 
     let expiryDateObject = null;
     if (docParams.expiry) {
@@ -27,7 +57,7 @@ async function createInvoice(docParams) {
 
     generateTopAccent(doc, 7, docParams.accentColour);
     await generateHeader(doc, docParams);
-    generateCustomerInformation(doc, docParams, expiryDateObject, currencySymbol);
+    generateCustomerInformation(doc, docParams, expiryDateObject, currencySymbol, invoiceDateObject);
     const invoiceTableEndPosition = generateInvoiceTable(doc, docParams, currencySymbol);
     if (showPayNowButton) {
         generatePayNowButton(doc, invoiceTableEndPosition + 30, docParams);
@@ -81,7 +111,7 @@ async function generateHeader(doc, docParams) {
         .moveDown();
 }
 
-function generateCustomerInformation(doc, invoice, expiryDateObject, currencySymbol) {
+function generateCustomerInformation(doc, invoice, expiryDateObject, currencySymbol, invoiceDateObject) {
     doc
         .fillColor("#444444")
         .fontSize(20)
@@ -97,7 +127,7 @@ function generateCustomerInformation(doc, invoice, expiryDateObject, currencySym
         .text(invoice.invoice_nr, 150, customerInformationTop)
         .font("Helvetica")
         .text(RECORD_TYPE_TEXT + " Date:", 50, customerInformationTop + 15)
-        .text(formatDate(new Date()), 150, customerInformationTop + 15)
+        .text(formatDate(invoiceDateObject), 150, customerInformationTop + 15)
         .text("Balance " + DUE_OR_PAID_TEXT + ":", 50, customerInformationTop + 30)
         .text(
             formatCurrency(invoice.subtotal - invoice.discount, currencySymbol), 150, customerInformationTop + 30
